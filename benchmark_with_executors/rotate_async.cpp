@@ -97,33 +97,32 @@ auto test(ExPolicy policy, std::size_t iterations, std::size_t n, Flag flag)
 int hpx_main()
 {
     // define launch policy p
-    // hpx::execution::experimental::explicit_scheduler_executor<
-    //     hpx::execution::experimental::thread_pool_scheduler> p;
+    hpx::execution::experimental::explicit_scheduler_executor<
+        hpx::execution::experimental::thread_pool_scheduler> p;
 
-    // // lanuch executor
-    // auto exec = hpx::execution::experimental::with_priority(p, hpx::threads::thread_priority::bound);
+    // lanuch executor
+    auto exec = hpx::execution::experimental::with_priority(p, hpx::threads::thread_priority::bound);
     
     auto& seq_pol = hpx::execution::seq;
     auto& par_pol = hpx::execution::par;
-    //auto par_sr_pol = hpx::execution::par.on(exec);
-   // auto par_task_sr_pol = hpx::execution::par(task).on(exec);
+    auto par_sr_pol = hpx::execution::par.on(exec);
+    auto par_task_sr_pol = hpx::execution::par(task).on(exec);
 
     std::cout << "rotate test Sender&Receiver \n";
     int threadsNum = hpx::get_os_thread_count();
     std::cout << "Threads : " << threadsNum << '\n';
-    std::ofstream fout("1212_rotate_medusa01_threads=1_02res.csv");
+    std::ofstream fout("3_rotate_medusa_threads=40_res.csv");
 
     fout << "threadsNum = " << threadsNum <<'\n';
-   //fout << "n,i,seq,par,par_SR,par_task_SR,seq/par, seq/par_SR, seq/par_task_SR \n";
-   fout << "n,i,seq,par \n";
+    fout << "n,i,seq,par,par_SR,par_task_SR,seq/par, seq/par_SR, seq/par_task_SR \n";
     for (std::size_t i = 10; i <= 28; i++)
     {
         std::size_t n = std::pow(2, i);
         mid = n/8;
         double SEQ = test(seq_pol, 10, n, std::false_type{});
         double PAR = test(par_pol, 10, n, std::false_type{});
-        //double Par_SR = test(par_sr_pol, 10, n, std::false_type{});
-        //double Par_Task_SR = test(par_task_sr_pol, 10, n, std::true_type{});
+        double Par_SR = test(par_sr_pol, 10, n, std::false_type{});
+        double Par_Task_SR = test(par_task_sr_pol, 10, n, std::true_type{});
 
         // double SEQ = test<decltype(seq_pol), std::false_type>(seq_pol, 10, n, std::false_type{});
         // double PAR = test<decltype(par_pol), std::false_type>(par_pol, 10, n, std::false_type{});
@@ -139,12 +138,12 @@ int hpx_main()
         fout << n << ","
             << i << "," 
             << SEQ << ","
-            << PAR  << "," << "\n";
-           // << Par_SR <<","
-           // << Par_Task_SR <<","
-           // << SEQ/PAR <<","<<"\n";
-           // << SEQ/Par_SR <<","
-            //<< SEQ/Par_Task_SR << "\n";
+            << PAR  << ","
+            << Par_SR <<","
+            << Par_Task_SR <<","
+            << SEQ/PAR <<","
+            << SEQ/Par_SR <<","
+            << SEQ/Par_Task_SR << "\n";
     }
     fout.close();
     return hpx::local::finalize();
