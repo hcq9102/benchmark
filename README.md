@@ -1,9 +1,9 @@
 # benchmark
-主要有两个benchmark: oldbenchmark 和 newbenchmark
+Two base benchmarks: oldbenchmark & newbenchmark
 
 
 benchmark_with_executors
 
 benchmark_scatter plot
-这两个是基于newbenchmark根据需求稍作调整的：
+these two are modified based on 'newbenchmark' according to different needs.
 
